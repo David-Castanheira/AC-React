@@ -26,7 +26,7 @@ def formulario():
     cursor = cnx.cursor()
 
     query = "INSERT INTO formulario (nome, endereco, telefone) VALUES (%s, %s, %s)"
-    cursor.execute(query)
+    cursor.execute(query, (nome, endereco, telefone))
     cnx.commit()
     cursor.close()
     cnx.close()
