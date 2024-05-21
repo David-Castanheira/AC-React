@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
-from mysql import connector as con
+import mysql.connector
 from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 # Configuração e conexão do banco de dados 
 config = {
@@ -11,22 +14,23 @@ config = {
     'raise_on_warnings': True
 }
 
-app = Flask(__name__)
-CORS(app)
-
-db = con.connect(user = 'root', password = 'impacta2024', database = 'aulareact')
-
+# Rota que captura dados do formulário e insere dados no banco com path definido no arquivo 'Form.js'
 @app.route('/api/formulario', methods=['GET', 'POST'])
 def formulario():
     json = request.get_json()
     nome = json['txtNome']
-    
-    cursor = db.cursor()
-    query = "INSERT INTO formulario(nome) VALUES ('%s');" %nome
+    endereco = json['txtEndereco']
+    telefone = json['txtTelefone']
+
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor()
+
+    query = "INSERT INTO formulario (nome, endereco, telefone) VALUES (%s, %s, %s)"
     cursor.execute(query)
-    db.commit()
+    cnx.commit()
     cursor.close()
-    return f'{nome} adicionado com sucesso!', 200
+    cnx.close()
+    return f'{nome, endereco, telefone} adicionados com sucesso!', 200
 
 if __name__ == "__main__":
     app.run(debug=True)
